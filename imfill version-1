@@ -1,0 +1,41 @@
+/* Author: Sachchidanand Deo
+Function: imfill matlab function
+Input arguments: Input image, stored in inputimg, threshold modified as input parameter in thresholding function
+Output arguments: Output image, stored in imout*/
+/* General overview/algorithm: First we need to start off with conversion of the input image into the binary image by using thresholding. Thresholding is selected based upon the input image. Then use floodFill function of opencv to fill the background of the image with white. This will separate the region of interest from the background, then perform OR operation, to fill the small disaparities inside the region, to separate the area of interest from background, which is logical function of imfill.*/
+//start off with including opencv library from cv2
+#include "opencv2/opencv.hpp"   
+
+using namespace cv; //this line tells the compiler that we are going to use names/functions defined in the namespace cv. This namespace consists the required classes and functions.
+
+//starting with main function with argc and **argv as input arguments.
+int main(int argc, char **argv)
+{
+// use imread to read the image. IMREAD_GRAYSCALE is used to return the 
+// image in grayscale format, which is stored in the inputimg, in the form // of matrix.
+    Mat inputimg = imread("nickel.jpg", IMREAD_GRAYSCALE);
+ 
+   
+    // Thresholding function(threshold)
+/* Set values equal to or above 220 to 0, set values below 220 to 255, which is basically inverted operation and hence need THRESH_BINARY_INV for inverting threshold operation.*/
+    Mat th;
+    threshold(inputimg, th, 220, 255, THRESH_BINARY_INV);
+    
+// Now we know that pixel (0,0) constitutes to the background and hence // start off with filling pixel (0,0) as white and go on doing it with the background, with only area of interest as black. That is background will turn white. Clone function is used for copying. Scalar 255 defines that we have to fill the background pixels with white.
+    Mat imffill = th.clone();
+    floodFill(imffill, cv::Point(0,0), Scalar(255));
+// Invert floodfilled image, by using bitwise not operation. This will // make the region of interest white and will turn background into black. 
+    Mat imffinv;// define matrix to store inverted image
+bitwise_not(imffill, imffinv);//bitwise not opveration, output stored // in imffinv.
+     
+//Perform the bitwise or operation on threshold image and inverted //image to get the output, stored in imout.
+    Mat imout = (th | imffinv); 
+ 
+    // Display all the images using imshow function.
+    imshow("Thresholded Image", th); //thresholded image
+    imshow("Floodfilled Image", imffill); //filled image
+    imshow("Output Image", imout); //final image, aka output.
+    waitKey(0);
+     
+}
+
