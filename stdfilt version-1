@@ -1,0 +1,39 @@
+/*Author: Sachchidanand Deo
+Function of the code: stdfilt matlab function
+Input arguments: Input image, given by user stored in imgin
+Output arguments: Final output image, stored in imgout*/
+/*Overview or Algorithm: ‘Stdfilt’ function from Matlab is a standard deviation function, which uses 3x3 standard window and scans across the image and return the standard deviation of the image pixels and then stores it at the center of the 3x3 window.  To implement it, we need to convert the formula of standard deviation in terms of convolution of kernel(matrix with all ones), with the input image, to obtain the required output. Standard deviation is nothing but square root of summation of square of input minus mean term, which can be stated in the form of two separate convolutions. One convolution is of input image square with the kernel and the second is input image with kernel, whose square is taken. This two convolutions can then be subtracted from each other and square root is taken to get the standard deviation. If the substraction is negative, standard deviation is zero, as seen in source code of stdfilt.m matlab function.*/
+
+//start off with including opencv library from cv2
+#include "opencv2/opencv.hpp"   
+
+using namespace cv; //this line tells the compiler that we are going to use names/functions defined in the namespace cv. This namespace consists the required classes and functions.
+
+//starting with main function with argc and **argv as input arguments.
+int main(int argc, char **argv)
+
+{
+// use imread to read the image. IMREAD_GRAYSCALE is used to return the 
+// image in grayscale format, which is stored in the imgin, in the form of a matrix.
+    Mat imgin = imread("fruits.jpg", IMREAD_GRAYSCALE);
+//Scale the image by dividing it by 255
+	imgin = imgin / 255.0;
+
+//create an 3X3 kernel with all ones.
+        Mat A = Mat::ones(3, 3);
+//find some of the all elements of the kernel, so that we get number of elements term in standard deviation.
+ Scalar a= sum(A);
+	Scalar b= a-1;
+//define output and intermediate matrices.
+	Mat c1, c2, j1, j2;
+//do convolution using filter2D function in the opencv, which takes imgin and kernel as input images, alogside number of terms or square of number of terms as other parameters. BORDER_REFLECT is used for border pixels. For border pixels, there will be only one side and hence border reflect gives reflection of the pixels of the one side and then puts them on the other side, for smooth filtering operation. Ouput images or matrices are stored in c1 and c2.
+	cv2.filter2D(imgin**2, c1, -1, A/b, borderType=cv2.BORDER_REFLECT);
+	cv2.filter2D(imgin, c2, -1, A, borderType=cv2.BORDER_REFLECT)**2 / (a*b)
+//subtract c1 and c2 and then compare it with 0,to find maximum value, if c1-c2 is negative, that means standard deviation is zero. Otherwise store the maximum value in j1.
+max(c1-c2, 0, j1);
+//take square root of the j1 and then store it in the j2, which is standard deviation.
+sqrt(j1, j2);
+//Display the output filtered image using imshow function
+imshow(“output image”, j2);
+waitkey(0);
+}
