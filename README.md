@@ -1,5 +1,5 @@
 # Image-Processing-Toolbox
-Contains the codes for image processing toolbox for FOSSEE toolbox project
+Contains the codes for image processing toolbox for FOSSEE toolbox project.
 This github project consits of codes created by Mr. Sachchidanand Deo for image processing toolbox application.
 # How to execute or run the code
 To run this code, first download and install opencv 2.4.9 or later versions and Microsoft Visual Studio 2010 or later.
