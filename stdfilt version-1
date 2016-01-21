@@ -7,33 +7,40 @@ Output arguments: Final output image, stored in imgout*/
 //start off with including opencv library from cv2
 #include "opencv2/opencv.hpp"   
 
-using namespace cv; //this line tells the compiler that we are going to use names/functions defined in the namespace cv. This namespace consists the required classes and functions.
+using namespace cv;//this line tells the compiler that we are going to use names/functions defined in the namespace cv. This namespace consists the required classes and functions.
+using namespace std;
 
 //starting with main function with argc and **argv as input arguments.
 int main(int argc, char **argv)
 
 {
-// use imread to read the image. IMREAD_GRAYSCALE is used to return the 
-// image in grayscale format, which is stored in the imgin, in the form of a matrix.
-    Mat imgin = imread("fruits.jpg", IMREAD_GRAYSCALE);
-//Scale the image by dividing it by 255
+	// use imread to read the image. IMREAD_GRAYSCALE is used to return the 
+	// image in grayscale format, which is stored in the imgin, in the form of a matrix.
+	Mat imgin = imread("fruits.jpg", IMREAD_GRAYSCALE);
+	//Scale the image by dividing it by 255
 	imgin = imgin / 255.0;
 
-//create an 3X3 kernel with all ones.
-        Mat A = Mat::ones(3, 3);
-//find some of the all elements of the kernel, so that we get number of elements term in standard deviation.
- Scalar a= sum(A);
-	Scalar b= a-1;
-//define output and intermediate matrices.
-	Mat c1, c2, j1, j2;
-//do convolution using filter2D function in the opencv, which takes imgin and kernel as input images, alogside number of terms or square of number of terms as other parameters. BORDER_REFLECT is used for border pixels. For border pixels, there will be only one side and hence border reflect gives reflection of the pixels of the one side and then puts them on the other side, for smooth filtering operation. Ouput images or matrices are stored in c1 and c2.
-	cv2.filter2D(imgin**2, c1, -1, A/b, borderType=cv2.BORDER_REFLECT);
-	cv2.filter2D(imgin, c2, -1, A, borderType=cv2.BORDER_REFLECT)**2 / (a*b)
-//subtract c1 and c2 and then compare it with 0,to find maximum value, if c1-c2 is negative, that means standard deviation is zero. Otherwise store the maximum value in j1.
-max(c1-c2, 0, j1);
-//take square root of the j1 and then store it in the j2, which is standard deviation.
-sqrt(j1, j2);
-//Display the output filtered image using imshow function
-imshow(“output image”, j2);
-waitkey(0);
+	//create an 3X3 k0ernel with all ones.
+	Mat A = Mat::ones(3, 3, CV_8U);
+	//find some of the all elements of the kernel, so that we get number of elements term in standard deviation.
+	double a = cv::sum(A)[0];
+	double b=a-1;
+	//define output and intermediate matrices.
+	Mat c1, c2, j1, j2, c3;
+	int borderType = BORDER_REFLECT;
+	Point anchor = Point(-1, -1);
+	double delta = 0;
+	//do convolution using filter2D function in the opencv, which takes imgin and kernel as input images, alogside number of terms or square of number of terms as other parameters. BORDER_REFLECT is used for border pixels. For border pixels, there will be only one side and hence border reflect gives reflection of the pixels of the one side and then puts them on the other side, for smooth filtering operation. Ouput images or matrices are stored in c1 and c2.
+	cv::filter2D(imgin ^ 2, c1, -1, A / b,anchor,delta, borderType);
+	cv::filter2D(imgin, c2, -1, A,  anchor, delta, borderType);
+	c3 = c2 / (a*b);
+		//subtract c1 and c2 and then compare it with 0,to find maximum value, if c1-c2 is negative, that means standard deviation is zero. Otherwise store the maximum value in j1.
+		max(c1 - c2, 0, j1);
+	//take square root of the j1 and then store it in the j2, which is standard deviation.
+	sqrt(j1, j2);
+	//Display the  filtered image using imshow function
+	imshow("output image", j2);
+	 waitKey(0);
+
 }
+
